@@ -152,21 +152,21 @@ class DeliveryTest {
         $("[data-test-id=success-notification]").shouldNotBe(visible, Duration.ofSeconds(15));
     }
 
-//    @Test
-//    void shouldNotPlanMeetingForInvalidPhone() {
-//        $("[data-test-id=city] input").val(DataGenerator.generateCity());
-//        $("[data-test-id=date] input").sendKeys(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE);
-//        $("[data-test-id=date] input").val(DataGenerator.generateDate(4));
-//        $("[data-test-id=name] input").val(DataGenerator.generateName("ru"));
-//        $("[data-test-id=phone] input").val(DataGenerator.generatePhone("ru").substring(0,9));
-//        $("[data-test-id=agreement]").click();
-//        $$("button").find(exactText("Запланировать")).click();
-//        $("[data-test-id=phone].input_invalid .input__sub")
-//                .shouldBe(exactText("Телефон указан неверно. Должно быть 11 цифр, например, +79012345678."));
-//        $$("button").find(exactText("Запланировать")).click();
-//        $("[data-test-id=success-notification]").shouldNotBe(visible, Duration.ofSeconds(15));
-//
-//    }
+    @Test
+    void shouldNotPlanMeetingForInvalidPhone() {
+        $("[data-test-id=city] input").val(DataGenerator.generateCity());
+        $("[data-test-id=date] input").sendKeys(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE);
+        $("[data-test-id=date] input").val(DataGenerator.generateDate(4));
+        $("[data-test-id=name] input").val(DataGenerator.generateName("ru"));
+        $("[data-test-id=phone] input").val(DataGenerator.generatePhone("ru").substring(0,9));
+        $("[data-test-id=agreement]").click();
+        $$("button").find(exactText("Запланировать")).click();
+        $("[data-test-id=phone].input_invalid .input__sub")
+                .shouldBe(exactText("Телефон указан неверно. Должно быть 11 цифр, например, +79012345678."));
+        $$("button").find(exactText("Запланировать")).click();
+        $("[data-test-id=success-notification]").shouldNotBe(visible, Duration.ofSeconds(15));
+
+    }
 
     @Test
     void shouldNotPlanMeetingForEmptyFields() {
