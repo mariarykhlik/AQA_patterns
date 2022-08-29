@@ -1,18 +1,30 @@
 package ru.netology.delivery.test;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import com.codeborne.selenide.logevents.SelenideLogger;
+import io.qameta.allure.selenide.AllureSelenide;
+import org.junit.jupiter.api.*;
 import org.openqa.selenium.Keys;
 import ru.netology.delivery.data.DataGenerator;
 
 import java.time.Duration;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 import static com.codeborne.selenide.Condition.*;
-import static com.codeborne.selenide.Selectors.withText;
+import static com.codeborne.selenide.Selectors.*;
 import static com.codeborne.selenide.Selenide.*;
 
 class DeliveryTest {
+
+    @BeforeAll
+    static void setUpAll() {
+        SelenideLogger.addListener("allure", new AllureSelenide());
+    }
+
+    @AfterAll
+    static void tearDownAll() {
+        SelenideLogger.removeListener("allure");
+    }
 
     @BeforeEach
     void setUp() {
@@ -53,7 +65,10 @@ class DeliveryTest {
 
     @Test
     void shouldSuccessfulPlanAndReplanMeetingUsingVidgets() {
-        var daysToAddForFirstMeeting = 3;
+        var defaultMeetingDate = DataGenerator.generateDate(3);
+        var defaultMeetingMonth = LocalDate.parse(defaultMeetingDate, DateTimeFormatter.ofPattern("dd.MM.yyyy"))
+                .getMonthValue();
+        var daysToAddForFirstMeeting = 4;
         var firstMeetingDate = DataGenerator.generateDate(daysToAddForFirstMeeting);
         String firstMeetingDay;
         if (firstMeetingDate.charAt(0) == '0') {
@@ -61,6 +76,8 @@ class DeliveryTest {
         } else {
             firstMeetingDay = firstMeetingDate.substring(0, 2);
         }
+        var firstMeetingMonth = LocalDate.parse(firstMeetingDate, DateTimeFormatter.ofPattern("dd.MM.yyyy"))
+                .getMonthValue();
         var daysToAddForSecondMeeting = 12;
         var secondMeetingDate = DataGenerator.generateDate(daysToAddForSecondMeeting);
         String secondMeetingDay;
@@ -69,13 +86,16 @@ class DeliveryTest {
         } else {
             secondMeetingDay = secondMeetingDate.substring(0, 2);
         }
+        var secondMeetingMonth = LocalDate.parse(secondMeetingDate, DateTimeFormatter.ofPattern("dd.MM.yyyy"))
+                .getMonthValue();
         var locale = "ru";
         var city = DataGenerator.generateCity();
         $("[data-test-id=city] input").val(city.substring(0, 2));
         $(withText(city)).scrollTo().click();
         $("button .icon_name_calendar").click();
-        if (firstMeetingDay.length() == 1) {
-            $$("[data-step=1]").filterBy(visible).first().click();
+        if (firstMeetingMonth == (defaultMeetingMonth + 1)) {
+            $$(".calendar__arrow_direction_right").filterBy(visible)
+                    .findBy(attribute("data-step", "1")).click();
             $$("[data-day]").filterBy(visible).findBy(exactText(firstMeetingDay)).click();
         } else {
             $$("[data-day]").filterBy(visible).findBy(exactText(firstMeetingDay)).click();
@@ -88,8 +108,9 @@ class DeliveryTest {
         $(".notification__content").shouldHave(text("Встреча успешно запланирована на " + firstMeetingDate))
                 .shouldBe(visible, Duration.ofSeconds(15));
         $("button .icon_name_calendar").click();
-        if (secondMeetingDay.length() == 1) {
-            $$("[data-step='1']").filterBy(visible).first().click();
+        if (secondMeetingMonth == (defaultMeetingMonth + 1)) {
+            $$(".calendar__arrow_direction_right").filterBy(visible)
+                    .findBy(attribute("data-step", "1")).click();
             $$("[data-day]").filterBy(visible).findBy(exactText(secondMeetingDay)).click();
         } else {
             $$("[data-day]").filterBy(visible).findBy(exactText(secondMeetingDay)).click();
@@ -158,7 +179,7 @@ class DeliveryTest {
         $("[data-test-id=date] input").sendKeys(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE);
         $("[data-test-id=date] input").val(DataGenerator.generateDate(4));
         $("[data-test-id=name] input").val(DataGenerator.generateName("ru"));
-        $("[data-test-id=phone] input").val(DataGenerator.generatePhone("ru").substring(0,9));
+        $("[data-test-id=phone] input").val(DataGenerator.generatePhone("ru").substring(0, 9));
         $("[data-test-id=agreement]").click();
         $$("button").find(exactText("Запланировать")).click();
         $("[data-test-id=phone].input_invalid .input__sub")
