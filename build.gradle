@@ -21,16 +21,22 @@ allure {
 
 repositories {
     mavenCentral()
+    mavenLocal()
 }
 
 dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.0'
-    testImplementation 'com.codeborne:selenide:6.7.2'
+    testImplementation 'com.codeborne:selenide:6.7.3'
     testImplementation 'com.github.javafaker:javafaker:1.0.2'
     testImplementation 'io.qameta.allure:allure-selenide:2.19.0'
+    implementation 'com.epam.reportportal:agent-java-junit5:5.0.0'
+    implementation 'com.epam.reportportal:logger-java-logback:5.0.2'
+    implementation 'ch.qos.logback:logback-classic:1.2.3'
 }
 
 test {
     useJUnitPlatform()
     systemProperty 'selenide.headless', System.getProperty('selenide.headless')
+    testLogging.showStandardStreams = true
+    systemProperty 'junit.jupiter.extensions.autodetection.enabled', true
 }

@@ -3,8 +3,10 @@ package ru.netology.delivery.test;
 import com.codeborne.selenide.logevents.SelenideLogger;
 import io.qameta.allure.selenide.AllureSelenide;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.Keys;
 import ru.netology.delivery.data.DataGenerator;
+import ru.netology.delivery.util.ScreenShooterReportPortalExtension;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -13,8 +15,11 @@ import java.time.format.DateTimeFormatter;
 import static com.codeborne.selenide.Condition.*;
 import static com.codeborne.selenide.Selectors.*;
 import static com.codeborne.selenide.Selenide.*;
+import static ru.netology.delivery.util.LoggingUtils.*;
 
 class DeliveryTest {
+
+    @ExtendWith({ScreenShooterReportPortalExtension.class})
 
     @BeforeAll
     static void setUpAll() {
@@ -41,26 +46,37 @@ class DeliveryTest {
         var daysToAddForSecondMeeting = 7;
         var secondMeetingDate = DataGenerator.generateDate(daysToAddForSecondMeeting);
         $("[data-test-id=city] input").val(validUser.getCity());
+        logInfo("Ввод города " + validUser.getCity());
         $("[data-test-id=date] input").sendKeys(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE);
         $("[data-test-id=date] input").val(firstMeetingDate);
+        logInfo("Ввод даты " + firstMeetingDate);
         $("[data-test-id=name] input").val(validUser.getName());
+        logInfo("Ввод ФИО " + validUser.getName());
         $("[data-test-id=phone] input").val(validUser.getPhone());
+        logInfo("Ввод телефона " + validUser.getPhone());
         $("[data-test-id=agreement]").click();
+        logInfo("Установлена галочка на чекбоксе");
         $$("button").find(exactText("Запланировать")).click();
+        logInfo("Нажата кнопка Запланировать");
         $("[data-test-id=success-notification]").shouldBe(visible, Duration.ofSeconds(15));
         $(".notification__content").shouldHave(text("Встреча успешно запланирована на " + firstMeetingDate))
                 .shouldBe(visible, Duration.ofSeconds(15));
+        logInfo("Встреча успешно запланирована");
         $("[data-test-id=date] input").sendKeys(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE);
         $("[data-test-id=date] input").val(secondMeetingDate);
+        logInfo("Ввод новой даты " + secondMeetingDate);
         $$("button").find(exactText("Запланировать")).click();
+        logInfo("Нажата кнопка Запланировать");
         $("[data-test-id=replan-notification]").shouldBe(visible, Duration.ofSeconds(15));
         $$(".notification__content")
                 .findBy(text("У вас уже запланирована встреча на другую дату. Перепланировать?"))
                 .shouldBe(visible, Duration.ofSeconds(15));
         $$("button").find(exactText("Перепланировать")).click();
+        logInfo("Подтверждение, нажата кнопка Перепланировать");
         $("[data-test-id=success-notification]").shouldBe(visible, Duration.ofSeconds(15));
         $(".notification__content").shouldHave(text("Встреча успешно запланирована на " + secondMeetingDate))
                 .shouldBe(visible, Duration.ofSeconds(15));
+        logInfo("Встреча успешно перепланирована");
     }
 
     @Test
